@@ -1,11 +1,15 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.6-eclipse-temurin-17'
+        }
+    }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                url: 'https://github.com/mbxxxxx/Projet-DevOps-BouhmadiManar.git'
+                checkout scm
             }
         }
 
@@ -17,7 +21,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'java -cp target/classes app.Main'
+                sh 'mvn test'
             }
         }
 
