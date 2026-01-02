@@ -5,8 +5,11 @@ pipeline {
         }
     }
 
-    stages {
+    environment {
+        SLACK_WEBHOOK = credentials('slack-webhook')
+    }
 
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
@@ -29,6 +32,23 @@ pipeline {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
+        }
+    }
+
+    post {
+        success {
+            sh '''
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ Pipeline SUCCESS - Projet DevOps Bouhmadi Manar"}' \
+            $SLACK_WEBHOOK
+            '''
+        }
+        failure {
+            sh '''
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ Pipeline FAILED - Projet DevOps Bouhmadi Manar"}' \
+            $SLACK_WEBHOOK
+            '''
         }
     }
 }
